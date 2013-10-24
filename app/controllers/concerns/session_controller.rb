@@ -1,14 +1,53 @@
 class SessionController < ApplicationController
-	def new
+  before_action :is_authenticated?, only: [ :destroy ]
 
-	end
+  def new
+  	redirect_to root_url if current_user
+  end
 
-	def create
+  def create
+  	if params[:user][:password].blank?
+  		if @user = User.find_by(email: params[:user][:email])
+  			@user.code = SecureRandom.urlsafe_base64
+  			@user.expires_at = Time.now + 1.day
+  			@user.save	# save in the database
 
-	end
+				# SEND PASSWORD RESET EMAIL
 
-	def destroy
-		
-	end
+				flash.now[:notice] = "An email with instructions for " +
+					"reseting your password has been sent to you."
+				render :new
 
+  		else
+  			@registrant = Registrant.new
+  			@registrant.id = SecureRandom.urlsafe_base64
+  			@registrant.email = params[:user][email]
+  			@registrant.expires_at = Time.now + 1.day
+  			@registrant.save
+
+  			# SEND REGISTRATION EMAIL
+
+  			flash.now[:notice] = "An email with instructions for " +
+					"reseting your password has been sent to you."
+				render :new
+  		end
+  	else
+  		#attempt to authentication
+			@user = User.find_by(email: params[:user][:email])
+
+			if @user && @user.authenticate(params[:user][:password])
+				session[:user_id] = @user.id
+				redirect_to root_url
+			else
+				render :new, error: "Unable to sign you in. Please try again."
+			end
+  	end
+  end
+
+  def destroy 
+  	session[:user_id] = nil
+  	redirect_to login_url, notice: "You've logged out."
+  end
 end
+
+

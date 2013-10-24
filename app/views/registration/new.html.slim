@@ -5,11 +5,14 @@
       .col-lg-9
         = form_for :user, url: register_url, method: "POST", html: { role: "form"} do |f|
           .form-group
-            =f.label :email
-            = f.text_field :email, class: "form-control", placeholder: "Email address" 
+            =f.label :name
+            = f.text_field :name, class: "form-control", placeholder: "Name" 
           .form-group
             =f.label :password
             =f.password_field :password, class:"form-control", placeholder: "Password"
+          .form-group
+            =f.label :password_confirmation
+            =f.password_field :password_confirmation, class:"form-control", placeholder: "Retype your Password"
           .form-group
           	=> f.submit "Sign in", class: "btn btn-success"
             button.btn.btn-warning Show password

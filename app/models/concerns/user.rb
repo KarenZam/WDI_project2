@@ -12,7 +12,7 @@ class User
 	field :salt, type: String
 	field :fish, type: String
 
-	field :cold, type: String
+	field :code, type: String
 	field :expires_at, type: Time
 
 	before_save :encrypt_password
